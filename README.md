@@ -1,3 +1,3 @@
 # Vision-Language-Navigation
 ### Final Year Project
-### University of Moratuwa
+### University of Moratuwa - ENTC

@@ -5,7 +5,7 @@ TORCH_GPU_ID: 0
 NUM_ENVIRONMENTS: 1
 TENSORBOARD_DIR: data/tensorboard_dirs/cma
 CHECKPOINT_FOLDER: data/checkpoints/cma
-EVAL_CKPT_PATH_DIR: data/checkpoints/cma/ckpt.44.pth
+EVAL_CKPT_PATH_DIR: data/checkpoints/cma
 RESULTS_DIR: data/checkpoints/cma/evals
 
 EVAL:

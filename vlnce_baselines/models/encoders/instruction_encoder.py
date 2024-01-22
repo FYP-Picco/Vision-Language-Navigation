@@ -68,19 +68,20 @@ class InstructionEncoder(nn.Module):
             hidden_state: [batch_size x hidden_size]
         """
         if self.config.sensor_uuid == "instruction":
-            instruction = observations["instruction"].long()
-            lengths = (instruction != 0.0).long().sum(dim=1)
-            instruction = self.embedding_layer(instruction)
+            instruction = observations["instruction"].long()  #torch.Size([200, 1]) #instruction = tensor([[ 982,  717, 2202, 2056, 2207, 2167,   59, 1932, 1251,  103, 2384, 2112,            9, 2379,  160, 2202,  797, 2246, 2202,  246,    9,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0]], device='cuda:0')
+            lengths = (instruction != 0.0).long().sum(dim=1)  #tensor([21], device='cuda:0') -> number of nonzero tokens
+            instruction = self.embedding_layer(instruction)  #goes to Embedding(MOdule) #torch.Size([50, 200, 1])
         else:
-            instruction = observations["rxr_instruction"]
+            instruction = observations["rxr_instruction"]                                                                                                                                                                               
 
         lengths = (instruction != 0.0).long().sum(dim=2)
-        lengths = (lengths != 0.0).long().sum(dim=1).cpu()
+        lengths = (lengths != 0.0).long().sum(dim=1).cpu() #lengths = tensor([21])
 
+        # Packs a Tensor containing padded sequences of variable length.
         packed_seq = nn.utils.rnn.pack_padded_sequence(
             instruction, lengths, batch_first=True, enforce_sorted=False
-        )
-
+        ) #instruction = torch.Size([1, 200, 50]) , lengths = tensor([21])
+        # packed_sequence = torch.Size([21, 50])
         output, final_state = self.encoder_rnn(packed_seq)
 
         if self.config.rnn_type == "LSTM":

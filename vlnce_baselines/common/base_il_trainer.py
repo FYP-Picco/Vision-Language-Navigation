@@ -69,7 +69,7 @@ class BaseVLNCETrainer(BaseILTrainer):
         self.optimizer = torch.optim.Adam(
             self.policy.parameters(), lr=self.config.IL.lr
         )
-        if load_from_ckpt:
+        if load_from_ckpt:    #true in inference
             ckpt_path = config.IL.ckpt_to_load
             ckpt_dict = self.load_checkpoint(ckpt_path, map_location="cpu")
             self.policy.load_state_dict(ckpt_dict["state_dict"])
@@ -473,9 +473,9 @@ class BaseVLNCETrainer(BaseILTrainer):
             observation_space=observation_space,
             action_space=action_space,
         )
-        self.policy.eval()
+        self.policy.eval()  
 
-        observations = envs.reset()
+        observations = envs.reset()   
         observations = extract_instruction_tokens(
             observations, self.config.TASK_CONFIG.TASK.INSTRUCTION_SENSOR_UUID
         )
@@ -516,7 +516,7 @@ class BaseVLNCETrainer(BaseILTrainer):
             desc=f"[inference:{self.config.INFERENCE.SPLIT}]",
         ) as pbar:
             while envs.num_envs > 0:
-                current_episodes = envs.current_episodes()
+                current_episodes = envs.current_episodes()  #episode_id, scene_id, start_pos, start_rotation, instruction with tokens
                 with torch.no_grad():
                     actions, rnn_states = self.policy.act(
                         batch,
@@ -525,10 +525,11 @@ class BaseVLNCETrainer(BaseILTrainer):
                         not_done_masks,
                         deterministic=not config.INFERENCE.SAMPLE,
                     )
+                    #actions = tensor([[3]], device='cuda:0')
                     prev_actions.copy_(actions)
 
-                outputs = envs.step([a[0].item() for a in actions])
-                observations, _, dones, infos = [
+                outputs = envs.step([a[0].item() for a in actions]) #take a step in the simulated environment
+                observations, _, dones, infos = [     #observations = camera_input,instruction
                     list(x) for x in zip(*outputs)
                 ]
 

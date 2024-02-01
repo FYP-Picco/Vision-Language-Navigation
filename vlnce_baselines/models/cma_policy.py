@@ -223,7 +223,7 @@ class CMANet(Net):
         prev_actions: Tensor,
         masks: Tensor,
     ) -> Tuple[Tensor, Tensor]:
-        instruction_embedding = self.instruction_encoder(observations)
+        instruction_embedding = self.instruction_encoder(observations) #torch.Size([1, 256, 21])
         depth_embedding = self.depth_encoder(observations)
         depth_embedding = torch.flatten(depth_embedding, 2)
 
@@ -255,12 +255,12 @@ class CMANet(Net):
             masks,
         )
 
-        text_state_q = self.state_q(state)
-        text_state_k = self.text_k(instruction_embedding)
+        text_state_q = self.state_q(state) #torch.Size([1, 256])
+        text_state_k = self.text_k(instruction_embedding) #torch.Size([1, 256, 42])
         text_mask = (instruction_embedding == 0.0).all(dim=1)
         text_embedding = self._attn(
             text_state_q, text_state_k, instruction_embedding, text_mask
-        )
+        ) #torch.Size([1, 256])
 
         rgb_k, rgb_v = torch.split(
             self.rgb_kv(rgb_embedding), self._hidden_size // 2, dim=1

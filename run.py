@@ -85,7 +85,7 @@ def run_exp(exp_config: str, run_type: str, opts=None) -> None:
     elif run_type == "eval":
         trainer.eval()
     elif run_type == "inference":
-        trainer.inference()
+        trainer.single_inference()
 
 
 if __name__ == "__main__":

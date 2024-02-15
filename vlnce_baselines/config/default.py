@@ -230,7 +230,7 @@ _C.MODEL.INSTRUCTION_ENCODER.dataset_vocab = (
     "data/datasets/R2R_VLNCE_v1-3_preprocessed/train/train.json.gz"
 )
 _C.MODEL.INSTRUCTION_ENCODER.fine_tune_embeddings = False
-_C.MODEL.INSTRUCTION_ENCODER.embedding_size = 50
+_C.MODEL.INSTRUCTION_ENCODER.embedding_size = 768 #50=========================
 _C.MODEL.INSTRUCTION_ENCODER.hidden_size = 128
 _C.MODEL.INSTRUCTION_ENCODER.rnn_type = "LSTM"
 _C.MODEL.INSTRUCTION_ENCODER.final_state_only = True

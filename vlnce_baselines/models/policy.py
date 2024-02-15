@@ -31,7 +31,7 @@ class ILPolicy(Policy, metaclass=abc.ABCMeta):
         masks,
         deterministic=False,
     ):
-        features, rnn_states = self.net(
+        features, rnn_states = self.net(    #CMANet in inference
             observations, rnn_states, prev_actions, masks
         )
         distribution = self.action_distribution(features)

@@ -679,6 +679,33 @@ def generate_video(
             f"episode{episode_id}", checkpoint_idx, images, fps=fps
         )
 
+def generate_video_single(
+    video_option: List[str],
+    video_dir: Optional[str],
+    images: List[ndarray],
+    episode_id: Union[str, int],
+    checkpoint_idx: int,
+    fps: int = 10,
+) -> None:
+    """Generate video according to specified information. Using a custom
+    verion instead of Habitat's that passes FPS to video maker.
+
+    Args:
+        video_option: string list of "tensorboard" or "disk" or both.
+        video_dir: path to target video directory.
+        images: list of images to be converted to video.
+        episode_id: episode id for video naming.
+        checkpoint_idx: checkpoint index for video naming.
+        fps: fps for generated video.
+    """
+    if len(images) < 1:
+        return
+
+    video_name = f"episode={episode_id}-ckpt={checkpoint_idx}-" 
+    if "disk" in video_option:
+        assert video_dir is not None
+        images_to_video(images, video_dir, video_name, fps=fps)
+
 
 def compute_heading_to(
     pos_from: Union[List[float], ndarray], pos_to: Union[List[float], ndarray]

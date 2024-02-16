@@ -22,9 +22,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--run-type",
-        choices=["train", "eval", "inference"],
+        choices=["train", "eval", "inference", "single_inference"],
         required=True,
-        help="run type of the experiment (train, eval, inference)",
+        help="run type of the experiment (train, eval, inference, single_inference)",
     )
     parser.add_argument(
         "--exp-config",
@@ -86,6 +86,8 @@ def run_exp(exp_config: str, run_type: str, opts=None) -> None:
         trainer.eval()
     elif run_type == "inference":
         trainer.inference()
+    elif run_type == "single_inference":
+        trainer.single_inference()
 
 
 if __name__ == "__main__":

@@ -6,7 +6,7 @@ import torch.nn as nn
 from habitat import Config
 from habitat.core.simulator import Observations
 from torch import Tensor
-from transformers import BertModel
+# from transformers import BertModel
 
 class InstructionEncoder(nn.Module):
     def __init__(self, config: Config) -> None:
@@ -30,19 +30,19 @@ class InstructionEncoder(nn.Module):
             hidden_size=config.hidden_size,
             bidirectional=config.bidirectional,
         )    
-        self.embedding_layer = BertModel.from_pretrained('bert-base-cased')
-        # if config.sensor_uuid == "instruction":
-        #     if self.config.use_pretrained_embeddings:
-        #         self.embedding_layer = nn.Embedding.from_pretrained(
-        #             embeddings=self._load_embeddings(),
-        #             freeze=not self.config.fine_tune_embeddings,
-        #         )
-        #     else:  # each embedding initialized to sampled Gaussian
-        #         self.embedding_layer = nn.Embedding(
-        #             num_embeddings=config.vocab_size,
-        #             embedding_dim=config.embedding_size,
-        #             padding_idx=0,
-        #         )
+        # self.embedding_layer = BertModel.from_pretrained('bert-base-cased')
+        if config.sensor_uuid == "instruction":
+            if self.config.use_pretrained_embeddings:
+                self.embedding_layer = nn.Embedding.from_pretrained(
+                    embeddings=self._load_embeddings(),
+                    freeze=not self.config.fine_tune_embeddings,
+                )
+            else:  # each embedding initialized to sampled Gaussian
+                self.embedding_layer = nn.Embedding(
+                    num_embeddings=config.vocab_size,
+                    embedding_dim=config.embedding_size,
+                    padding_idx=0,
+                )
 
     @property
     def output_size(self):
@@ -70,9 +70,9 @@ class InstructionEncoder(nn.Module):
         if self.config.sensor_uuid == "instruction":
             instruction = observations["instruction"].long()  #torch.Size([1, 200]) #instruction = tensor([[ 982,  717, 2202, 2056, 2207, 2167,   59, 1932, 1251,  103, 2384, 2112,            9, 2379,  160, 2202,  797, 2246, 2202,  246,    9,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,    0,            0,    0,    0,    0,    0,    0,    0,    0]], device='cuda:0')
             lengths = (instruction != 0.0).long().sum(dim=1)  #tensor([21], device='cuda:0') -> number of nonzero tokens
-            instruction = self.embedding_layer(instruction)[0]
+            # instruction = self.embedding_layer(instruction)[0]
             # return instruction
-            # instruction = self.embedding_layer(instruction)  #goes to Embedding(MOdule) #torch.Size([1, 200, 50])
+            instruction = self.embedding_layer(instruction)  #goes to Embedding(MOdule) #torch.Size([1, 200, 50])
         else:
             instruction = observations["rxr_instruction"]                                                                                                                                                                               
 

@@ -197,13 +197,13 @@ class BaseVLNCETrainer(BaseILTrainer):
         self.policy.eval()
 
         processor = TextProcessor('data/Vocab_file.txt', torch.device('cuda:0'))
-        text = "Go striaght past the hallway, then take a right by the staircase. Go striaght past the notice board and stop near the window." #input('Give me an instruction:')#"Turn left until you see the red chair and stop. "
-        rgb,depth = Cam.newFrame() 
+        text = 'Go straight, wait at bottom of the staircase.'#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
+        rgb,_,depth = Cam.newFrame() 
         batch = processor.process(text)
         batch['rgb']=rgb
         batch['depth']=depth   
 
-        batch = apply_obs_transforms_batch(batch, self.obs_transforms)
+        #batch = apply_obs_transforms_batch(batch, self.obs_transforms)
         print(batch)
         num_envs=1
         
@@ -256,10 +256,10 @@ class BaseVLNCETrainer(BaseILTrainer):
                 dtype=torch.uint8,
                 device=self.device,
             )
-            rgb,depth = Cam.newFrame()
+            rgb,_,depth = Cam.newFrame()
             batch['rgb']=rgb
             batch['depth']=depth   
 
-            batch = apply_obs_transforms_batch(batch, self.obs_transforms)
+            #batch = apply_obs_transforms_batch(batch, self.obs_transforms)
             #print(batch)
     

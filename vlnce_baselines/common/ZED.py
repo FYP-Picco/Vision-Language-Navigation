@@ -43,30 +43,41 @@ class Cam():
     else: 
       print("Camera Initiated Successfully")
     
-  def showImages(rgb, depth,corrected_depth):
+  def showImages(rgb, depth,corrected_depth,sharpened):
     rgb = cv2.resize(rgb,(256,256))
     
     cv2.imshow("img", rgb) #Display image
     cv2.moveWindow('img',30,100)
+    cv2.imshow("sharpened img", sharpened) #Display image
+    cv2.moveWindow('sharpened img',420,100)
     cv2.imshow("dep", depth) #Display image
-    cv2.moveWindow('dep',420,100)
+    cv2.moveWindow('dep',820,100)
     cv2.imshow("corr_dep", corrected_depth) #Display image
-    cv2.moveWindow('corr_dep',820,100)
-      
+    cv2.moveWindow('corr_dep',1220,100)
+    # =================================================
+    # cv2.waitKey(0) 
+    # cv2.destroyAllWindows()
+
+  def closeAllWindows():    
     cv2.waitKey(0) 
     cv2.destroyAllWindows()
 
   def getRGB():
     image = sl.Mat()
+
     if zed.grab(runtime_parameters) == sl.ERROR_CODE.SUCCESS:  
       zed.retrieve_image(image, sl.VIEW.LEFT) # Retrieve the left image
       rgb = image.get_data()      
       h,w,_ = rgb.shape
       y = (w-h)//2
       rgb = rgb[:, y:y+h]
+      sharpened = Cam.sharpen_image(rgb)
+      sharpened = cv2.resize(sharpened,(224,224))      
+      sharpened=sharpened[:,:,:3]
       rgb = cv2.resize(rgb,(224,224))      
       rgb=rgb[:,:,:3]
-      return rgb
+      
+      return rgb,sharpened
     else:
       print("Failed to get RGB image")
       return
@@ -77,6 +88,10 @@ class Cam():
     # plt.show()
     return cv2.LUT(image, table)
 
+  def sharpen_image(image):
+    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+    sharpened = cv2.filter2D(image, -1, kernel)
+    return sharpened
 
   def getDepth():
     depth = sl.Mat()
@@ -110,19 +125,20 @@ class Cam():
     return torch.tensor([depth], dtype=torch.float, device=cuda0)
   
   def newFrame(): 
-    rgbArray = Cam.getRGB()
+    rgbArray,sharpenedArray = Cam.getRGB()
     depthArray, corrected_depthArray = Cam.getDepth()
-    Cam.showImages(rgbArray, depthArray,corrected_depthArray)  
+    Cam.showImages(rgbArray, depthArray,corrected_depthArray,sharpenedArray)  
     rgb = Cam.getRGB_t(rgbArray)
     depth = Cam.getDepth_t(depthArray) 
     corr_depth = Cam.getDepth_t(corrected_depthArray)
-    return rgb, depth, corr_depth
+    sharpened_rgb = Cam.getRGB_t(sharpenedArray)
+    return corr_depth,sharpened_rgb
     
 
   
 
 
-# rgb,depth,correctedDepth= Cam.newFrame()
+# correctedDepth,sharpened_rgb= Cam.newFrame()
 # Cam.showImages(rgb,depth, correctedDepth)
 
 

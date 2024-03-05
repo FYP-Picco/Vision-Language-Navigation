@@ -197,14 +197,14 @@ class BaseVLNCETrainer(BaseILTrainer):
         self.policy.eval()
 
         processor = TextProcessor('data/Vocab_file.txt', torch.device('cuda:0'))
-        text = 'Go straight, wait at bottom of the staircase.'#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
-        rgb,_,depth = Cam.newFrame() 
+        text = 'Turn right by the bulletin board, then turn left by the blue sofa, enter the hallway, wait near the door to the left.'#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
+        depth,rgb = Cam.newFrame() 
         batch = processor.process(text)
         batch['rgb']=rgb
         batch['depth']=depth   
 
         #batch = apply_obs_transforms_batch(batch, self.obs_transforms)
-        print(batch)
+        # print(batch)
         num_envs=1
         
         rnn_states = torch.zeros(
@@ -238,7 +238,8 @@ class BaseVLNCETrainer(BaseILTrainer):
                 action_value = actions.item()
                 _mapping = {0:'STOP', 1:'MOVE_FORWARD', 2:'TURN_LEFT', 3:'TURN_RIGHT'}
                 mapped_act = _mapping.get(action_value,'unknown')      
-                print(mapped_act)          
+                print(mapped_act)     
+                Cam.closeAllWindows()     
                 #actions = tensor([[3]], device='cuda:0')
                 prev_actions.copy_(actions)
               
@@ -256,7 +257,7 @@ class BaseVLNCETrainer(BaseILTrainer):
                 dtype=torch.uint8,
                 device=self.device,
             )
-            rgb,_,depth = Cam.newFrame()
+            depth,rgb = Cam.newFrame()
             batch['rgb']=rgb
             batch['depth']=depth   
 

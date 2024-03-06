@@ -9,13 +9,8 @@ import torch
 from habitat import logger
 from habitat_baselines.common.baseline_registry import baseline_registry
 
-import habitat_extensions  # noqa: F401
 import vlnce_baselines  # noqa: F401
 from vlnce_baselines.config.default import get_config
-from vlnce_baselines.nonlearning_agents import (
-    evaluate_agent,
-    nonlearning_inference,
-)
 
 
 def main():
@@ -66,27 +61,11 @@ def run_exp(exp_config: str, run_type: str, opts=None) -> None:
     if torch.cuda.is_available():
         torch.set_num_threads(1)
 
-    if run_type == "eval":
-        torch.backends.cudnn.deterministic = True
-        if config.EVAL.EVAL_NONLEARNING:
-            evaluate_agent(config)
-            return
-
-    if run_type == "inference" and config.INFERENCE.INFERENCE_NONLEARNING:
-        nonlearning_inference(config)
-        return
-
     trainer_init = baseline_registry.get_trainer(config.TRAINER_NAME) 
     assert trainer_init is not None, f"{config.TRAINER_NAME} is not supported"
     trainer = trainer_init(config)
 
-    if run_type == "train":
-        trainer.train()
-    elif run_type == "eval":
-        trainer.eval()
-    elif run_type == "inference":
-        trainer.inference()
-    elif run_type == "single_inference":
+    if run_type == "single_inference":
         trainer.single_inference()
 
 

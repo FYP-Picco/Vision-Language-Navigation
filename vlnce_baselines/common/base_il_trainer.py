@@ -197,9 +197,12 @@ class BaseVLNCETrainer(BaseILTrainer):
         self.policy.eval()
 
         processor = TextProcessor('data/Vocab_file.txt', torch.device('cuda:0'))
-        text = 'Turn right by the bulletin board, then turn left by the blue sofa, enter the hallway, wait near the door to the left.'#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
+        text = "Go forward and stop near the fire extinguisher."
+        #1."Exit the hallway, turn right and walk past the green sofa" 
+        #2."Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
+        #3.Exit the room through the door. Go straight through the hallway, stop at fire extinguisher.
         depth,rgb = Cam.newFrame() 
-        batch = processor.process(text)
+        batch = processor.process(text) 
         batch['rgb']=rgb
         batch['depth']=depth   
 

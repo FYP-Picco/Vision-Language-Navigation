@@ -2,6 +2,7 @@ import json
 import os
 import time
 import warnings
+import signal
 import cv2
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
@@ -230,6 +231,24 @@ class BaseVLNCETrainer(BaseILTrainer):
             os.makedirs(config.VIDEO_DIR, exist_ok=True)
         
 
+
+        def keyboardInterruptHandler(signal, frame):
+            print(" ---- Keyboard Interrupt ----")
+            print(" ---- Generating Video ----")
+            
+            if len(config.VIDEO_OPTION) > 0:
+                generate_video_single(
+                    video_option=config.VIDEO_OPTION,
+                    video_dir=config.VIDEO_DIR,
+                    images=rgb_frames[0],
+                    episode_id=10832,
+                    checkpoint_idx=45,
+                )
+            
+            exit(0)
+        
+        signal.signal(signal.SIGINT, keyboardInterruptHandler)
+        
         stop = False
         dones = [False]
         steps = 0 
@@ -247,8 +266,10 @@ class BaseVLNCETrainer(BaseILTrainer):
                 action_value = actions.item()
                 _mapping = {0:'STOP', 1:'MOVE_FORWARD', 2:'TURN_LEFT', 3:'TURN_RIGHT'}
                 mapped_act = _mapping.get(action_value,'unknown')      
-                print(mapped_act)   
-                Cam.closeAllWindows()                     
+                print(mapped_act) 
+                
+                Cam.closeAllWindows()
+                     
                 #actions = tensor([[3]], device='cuda:0')
                 prev_actions.copy_(actions)
               
@@ -289,17 +310,17 @@ class BaseVLNCETrainer(BaseILTrainer):
             batch['rgb']=rgb
             batch['depth']=depth   
 
-            if steps>=3:
-                break  
-            # batch = apply_obs_transforms_batch(batch, self.obs_transforms)
-            # print(batch)
+            # if steps>=3:
+            #     break  
+            #batch = apply_obs_transforms_batch(batch, self.obs_transforms)
+            #print(batch)
             
         if len(config.VIDEO_OPTION) > 0:
-            generate_video_single(
-                video_option=config.VIDEO_OPTION,
-                video_dir=config.VIDEO_DIR,
-                images=rgb_frames[0],
-                episode_id=10832,
-                checkpoint_idx=45,
-            )
+                generate_video_single(
+                    video_option=config.VIDEO_OPTION,
+                    video_dir=config.VIDEO_DIR,
+                    images=rgb_frames[0],
+                    episode_id=10832,
+                    checkpoint_idx=45,
+                )
     

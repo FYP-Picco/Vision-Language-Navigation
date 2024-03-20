@@ -21,9 +21,9 @@ from habitat_baselines.utils.common import batch_obs
 from vlnce_baselines.common.aux_losses import AuxLosses
 from vlnce_baselines.common.base_il_trainer import BaseVLNCETrainer
 
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=FutureWarning)
-    import tensorflow as tf  # noqa: F401
+# with warnings.catch_warnings():
+#     warnings.filterwarnings("ignore", category=FutureWarning)
+#     import tensorflow as tf  # noqa: F401
 
 
 class ObservationsDict(dict):

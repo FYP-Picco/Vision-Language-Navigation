@@ -32,9 +32,9 @@ import torch
 from vlnce_baselines.common.TextTokenz import TextProcessor
 from vlnce_baselines.common.video_utils import generate_video_single, append_text_to_images
 
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=FutureWarning)
-    import tensorflow as tf  # noqa: F401
+# with warnings.catch_warnings():
+#     warnings.filterwarnings("ignore", category=FutureWarning)
+#     import tensorflow as tf  # noqa: F401
 
 
 class BaseVLNCETrainer(BaseILTrainer):
@@ -148,7 +148,7 @@ class BaseVLNCETrainer(BaseILTrainer):
 
         checkpoint_path = self.config.INFERENCE.CKPT_PATH
         logger.info(f"checkpoint_path: {checkpoint_path}")
-
+        cam_instance = Cam()  # Instantiate the Cam class
         if self.config.INFERENCE.USE_CKPT_CONFIG:
             config = self._setup_eval_config(
                 self.load_checkpoint(checkpoint_path, map_location="cpu")[
@@ -200,11 +200,11 @@ class BaseVLNCETrainer(BaseILTrainer):
         self.policy.eval()
 
         processor = TextProcessor('data/Vocab_file.txt', torch.device('cuda:0'))
-        text = "Go forward and stop near the fire extinguisher."
+        text = "Exit the room through the door. Go straight through the hallway, stop at fire extinguisher."
         #1."Exit the hallway, turn right and walk past the green sofa" 
         #2."Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop." #input('Give me an instruction:')#"Exit the room through the door. Go straight through the hallway and enter the next room. Walk towards the table and stop."
         #3.Exit the room through the door. Go straight through the hallway, stop at fire extinguisher.
-        depth,rgb = Cam.newFrame() 
+        depth, rgb = cam_instance.newFrame()
         batch = processor.process(text) 
         batch['rgb']=rgb
         batch['depth']=depth   
@@ -268,7 +268,7 @@ class BaseVLNCETrainer(BaseILTrainer):
                 mapped_act = _mapping.get(action_value,'unknown')      
                 print(mapped_act) 
                 
-                Cam.closeAllWindows()
+                cam_instance.closeAllWindows()
                      
                 #actions = tensor([[3]], device='cuda:0')
                 prev_actions.copy_(actions)
@@ -286,7 +286,7 @@ class BaseVLNCETrainer(BaseILTrainer):
                 video = []
         
                 cpu_tensor_RGB = batch['rgb'].cpu()
-                src_rgb = np.float32(cpu_tensor_RGB)[0]
+                src_rgb = np.float32(cpu_tensor_RGB)[0].astype(np.uint8)
                 image_rgb = cv2.cvtColor(src_rgb, cv2.COLOR_BGR2RGB) 
                 video.append(image_rgb)
                 
@@ -306,7 +306,7 @@ class BaseVLNCETrainer(BaseILTrainer):
                 device=self.device,
             )
                 
-            depth,rgb = Cam.newFrame()
+            depth,rgb = cam_instance.newFrame()
             batch['rgb']=rgb
             batch['depth']=depth   
 
